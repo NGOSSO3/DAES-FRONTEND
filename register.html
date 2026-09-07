@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+    <li><a href="elimu.html" data-i18n="nav_education">Education</a></li>
+    <li><a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a></li>
+    <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <button class="icon-btn" data-lang-btn="en">EN</button>
+    <button class="icon-btn" data-lang-btn="sw">SW</button>
+  </div>
+</div></nav>
+
+<div class="auth-shell">
+  <div class="card">
+    <h2>Create your DAES account</h2>
+    <p style="margin-bottom:20px;">Register to get weather alerts, market prices and AI farming advice.</p>
+    <form id="registerForm">
+      <div class="field"><label for="fullName">Full name</label><input id="fullName" name="fullName" required></div>
+      <div class="field"><label for="phone">WhatsApp / phone number</label><input id="phone" name="phone" placeholder="+255 6xx xxx xxx" required></div>
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required></div>
+      <div class="field"><label for="village">Village / ward in Ilemela</label><input id="village" name="village" placeholder="e.g. Buhongwa"></div>
+      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" minlength="6" required></div>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Register</button>
+      <div id="formMsg"></div>
+    </form>
+    <div class="form-foot">Already have an account? <a href="login.html" style="color:var(--green-600); font-weight:600;">Log in</a></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("formMsg");
+  msg.className = "form-msg"; msg.textContent = "";
+  const payload = {
+    full_name: fullName.value, phone: phone.value, email: email.value,
+    village: village.value, password: password.value,
+  };
+  try {
+    const data = await DaesAPI.register(payload);
+    msg.className = "form-msg ok"; msg.textContent = "Account created — please log in.";
+    setTimeout(() => window.location.href = "login.html", 1000);
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+</script>
+</body></html>

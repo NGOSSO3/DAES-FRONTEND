@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+    <li><a href="elimu.html" data-i18n="nav_education">Education</a></li>
+    <li><a href="hali-ya-hewa.html" class="active" data-i18n="nav_weather">Weather</a></li>
+    <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+    <li><a href="msaada-ai.html" data-i18n="nav_ai">Ask AI</a></li>
+    <li><a href="about.html" data-i18n="nav_about">About Us</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <button class="icon-btn" data-lang-btn="en">EN</button>
+    <button class="icon-btn" data-lang-btn="sw">SW</button>
+    <a class="btn btn-outline" href="login.html" data-guest-only data-i18n="nav_login">Log in</a>
+    <a class="btn btn-gold" href="register.html" data-guest-only data-i18n="nav_register">Register</a>
+    <a class="btn btn-outline" href="dashboard.html" data-auth-only data-i18n="nav_dashboard">My Account</a>
+  </div>
+</div></nav>
+
+<section>
+  <div class="container">
+    <div class="tag">Weather</div>
+    <h1>Ilemela weather</h1>
+    <p>Live conditions and a 5-day outlook, powered by the OpenWeather API through the DAES backend.</p>
+
+    <div class="panel">
+      <div class="weather-now" id="weatherNow">
+        <div class="weather-icon" id="weatherIcon" aria-label="Current weather">☀️</div>
+        <div class="weather-temp">--°C</div>
+        <div>
+          <div id="weatherDesc" style="font-weight:600;">Loading...</div>
+          <div id="weatherMeta" style="color:var(--text-soft); font-size:.9rem;"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="margin-top:36px;">5-day forecast</h2>
+    <div class="forecast-row" id="forecastRow"></div>
+  </div>
+</section>
+
+<footer><div class="container">
+  <div><div class="brand-name" style="color:#eaf2e9;">DAES</div><p style="color:#b6c7bb;">Built by students for Ilemela's farmers.</p></div>
+  <div><a href="elimu.html">Education</a><a href="hali-ya-hewa.html">Weather</a><a href="soko.html">Market</a></div>
+  <div><a href="mawasiliano.html">Contact agricultural officer</a><a href="about.html">About Us</a><a href="login.html">Log in</a></div>
+  <div class="foot-bottom" style="grid-column:1/-1;">© 2026 DAES — Digital Agriculture Enhancement System, Ilemela, Mwanza.</div>
+</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/api.js"></script>
+<script>
+function weatherIcon(description){
+  const text = (description || "").toLowerCase();
+  if (text.includes("thunder")) return "⛈️";
+  if (text.includes("rain") || text.includes("drizzle")) return "🌧️";
+  if (text.includes("snow")) return "❄️";
+  if (text.includes("cloud")) return "☁️";
+  if (text.includes("mist") || text.includes("fog")) return "🌫️";
+  return "☀️";
+}
+
+async function loadWeather(){
+  try {
+    const now = await DaesAPI.weatherNow("Ilemela");
+    document.getElementById("weatherIcon").textContent = weatherIcon(now.description);
+    document.getElementById("weatherIcon").setAttribute("aria-label", now.description);
+    document.querySelector(".weather-temp").textContent = `${Math.round(now.temp)}°C`;
+    document.getElementById("weatherDesc").textContent = now.description;
+    document.getElementById("weatherMeta").textContent = `💧 Humidity ${now.humidity}% · 🌬️ Wind ${now.wind_speed} m/s · ${now.district}`;
+  } catch (err) {
+    document.getElementById("weatherDesc").textContent = "Could not load live weather (backend offline?)";
+  }
+  try {
+    const forecast = await DaesAPI.weatherForecast("Ilemela");
+    const row = document.getElementById("forecastRow");
+    row.innerHTML = forecast.days.map(d => `
+      <div class="forecast-day">
+        <div style="font-weight:600;">${d.day || d.label}</div>
+        <div class="forecast-icon" aria-label="${d.description}">${weatherIcon(d.description)}</div>
+        <div style="font-size:1.6rem; margin:6px 0;">${Math.round(d.temp)}°C</div>
+        <div style="color:var(--text-soft); font-size:.85rem;">${d.description}</div>
+      </div>`).join("");
+  } catch (err) { /* forecast optional */ }
+}
+loadWeather();
+</script>
+</body></html>

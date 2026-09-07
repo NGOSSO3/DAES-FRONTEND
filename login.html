@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+    <li><a href="elimu.html" data-i18n="nav_education">Education</a></li>
+    <li><a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a></li>
+    <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <button class="icon-btn" data-lang-btn="en">EN</button>
+    <button class="icon-btn" data-lang-btn="sw">SW</button>
+  </div>
+</div></nav>
+
+<div class="auth-shell">
+  <div class="card">
+    <h2>Welcome back</h2>
+    <p style="margin-bottom:20px;">Log in to your DAES account.</p>
+    <form id="loginForm">
+      <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required></div>
+      <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" required></div>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Log in</button>
+      <div id="formMsg"></div>
+    </form>
+    <div class="form-foot">No account yet? <a href="register.html" style="color:var(--green-600); font-weight:600;">Register</a></div>
+    <div class="form-foot">Administrator? <a href="admin.html" style="color:var(--green-600); font-weight:600;">Admin login</a></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("formMsg");
+  msg.className = "form-msg"; msg.textContent = "";
+  try {
+    const data = await DaesAPI.login({ email: email.value, password: password.value });
+    localStorage.setItem("daes_token", data.token);
+    localStorage.setItem("daes_user", JSON.stringify(data.user));
+    msg.className = "form-msg ok"; msg.textContent = "Logged in — redirecting...";
+    setTimeout(() => window.location.href = data.user.role === "admin" ? "admin.html" : "dashboard.html", 700);
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+</script>
+</body></html>

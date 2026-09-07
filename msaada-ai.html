@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask AI — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .chat-wrap{max-width:760px; margin:0 auto;}
+  .chat-log{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; min-height:340px; max-height:520px; overflow-y:auto; margin-bottom:16px;}
+  .msg{margin-bottom:14px; max-width:80%;}
+  .msg.user{margin-left:auto; text-align:right;}
+  .msg .bubble{display:inline-block; padding:10px 14px; border-radius:12px; background:var(--bg); border:1px solid var(--border);}
+  .msg.user .bubble{background:var(--green-600); color:#fff; border-color:var(--green-600);}
+  .chat-input{display:flex; gap:10px;}
+  .chat-input input{flex:1;}
+  .ai-history{margin-top:42px;}
+  .history-list{display:grid; gap:12px;}
+  .history-item{padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);}
+  .history-question{font-weight:600; margin-bottom:7px;}
+  .history-answer{white-space:pre-wrap; color:var(--muted);}
+  .history-date{font-size:.8rem; color:var(--muted); margin-top:8px;}
+</style>
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+    <li><a href="elimu.html" data-i18n="nav_education">Education</a></li>
+    <li><a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a></li>
+    <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+    <li><a href="msaada-ai.html" class="active" data-i18n="nav_ai">Ask AI</a></li>
+    <li><a href="about.html" data-i18n="nav_about">About Us</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <button class="icon-btn" data-lang-btn="en">EN</button>
+    <button class="icon-btn" data-lang-btn="sw">SW</button>
+    <a class="btn btn-outline" href="login.html" data-guest-only data-i18n="nav_login">Log in</a>
+    <a class="btn btn-gold" href="register.html" data-guest-only data-i18n="nav_register">Register</a>
+    <a class="btn btn-outline" href="dashboard.html" data-auth-only data-i18n="nav_dashboard">My Account</a>
+  </div>
+</div></nav>
+
+<section>
+  <div class="container chat-wrap">
+    <div class="tag">AI Assistant</div>
+    <h1>Ask the DAES farming assistant</h1>
+    <p>Ask about crops, livestock, fish, weather timing or market decisions around Ilemela. You must be logged in — the assistant is powered by Gemini through our secure backend, never with a key exposed in this page.</p>
+    <div class="chat-log" id="chatLog">
+      <div class="msg bot"><div class="bubble">Habari! Ask me anything about farming, weather timing or market decisions in Ilemela.</div></div>
+    </div>
+    <form class="chat-input" id="chatForm">
+      <input type="text" id="chatInput" placeholder="e.g. When should I plant maize this season?" required>
+      <button class="btn btn-primary" type="submit">Send</button>
+    </form>
+    <div class="ai-history">
+      <h2>AI history</h2>
+      <div class="history-list" id="historyList"><p>Loading history...</p></div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="container">
+  <div><div class="brand-name" style="color:#eaf2e9;">DAES</div><p style="color:#b6c7bb;">Built by students for Ilemela's farmers.</p></div>
+  <div><a href="elimu.html">Education</a><a href="hali-ya-hewa.html">Weather</a><a href="soko.html">Market</a></div>
+  <div><a href="mawasiliano.html">Contact agricultural officer</a><a href="about.html">About Us</a><a href="login.html">Log in</a></div>
+  <div class="foot-bottom" style="grid-column:1/-1;">© 2026 DAES — Digital Agriculture Enhancement System, Ilemela, Mwanza.</div>
+</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/api.js"></script>
+<script>
+function addMsg(text, who){
+  const log = document.getElementById("chatLog");
+  const div = document.createElement("div");
+  div.className = `msg ${who}`;
+  div.innerHTML = `<div class="bubble"></div>`;
+  div.querySelector(".bubble").textContent = text;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function renderHistory(items){
+  const list = document.getElementById("historyList");
+  list.replaceChildren();
+  if (!items.length){
+    list.innerHTML = "<p>No previous questions yet.</p>";
+    return;
+  }
+  items.forEach(item => {
+    const entry = document.createElement("article");
+    entry.className = "history-item";
+    const question = document.createElement("div");
+    question.className = "history-question";
+    question.textContent = "Q: " + item.question;
+    const answer = document.createElement("div");
+    answer.className = "history-answer";
+    answer.textContent = item.answer;
+    const date = document.createElement("div");
+    date.className = "history-date";
+    date.textContent = new Date(item.created_at).toLocaleString();
+    entry.append(question, answer, date);
+    list.appendChild(entry);
+  });
+}
+
+async function loadHistory(){
+  if (!localStorage.getItem("daes_token")) return;
+  const list = document.getElementById("historyList");
+  try {
+    const data = await apiRequest("/ai/history", { auth: true });
+    renderHistory(data.history);
+  } catch (err) {
+    list.innerHTML = `<p>Could not load history: ${err.message}</p>`;
+  }
+}
+
+document.getElementById("chatForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const input = document.getElementById("chatInput");
+  const question = input.value.trim();
+  if (!question) return;
+  if (!localStorage.getItem("daes_token")){
+    addMsg("Please log in first to use the AI assistant.", "bot");
+    return;
+  }
+  addMsg(question, "user");
+  input.value = "";
+  addMsg("Thinking...", "bot");
+  try {
+    const data = await DaesAPI.askAI(question);
+    document.querySelectorAll(".msg.bot .bubble")[document.querySelectorAll(".msg.bot .bubble").length - 1].textContent = data.answer;
+    loadHistory();
+  } catch (err) {
+    document.querySelectorAll(".msg.bot .bubble")[document.querySelectorAll(".msg.bot .bubble").length - 1].textContent = "Sorry, I couldn't reach the assistant: " + err.message;
+  }
+});
+
+loadHistory();
+</script>
+</body></html>

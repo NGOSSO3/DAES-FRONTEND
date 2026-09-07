@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAES — Digital Agriculture Enhancement System</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">D</span>
+      <span class="brand-name">DAES<small>Ilemela · Mwanza</small></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+      <li><a href="elimu.html" data-i18n="nav_education">Education</a></li>
+      <li><a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a></li>
+      <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+      <li><a href="msaada-ai.html" data-i18n="nav_ai">Ask AI</a></li>
+      <li><a href="about.html" data-i18n="nav_about">About Us</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+      <button class="icon-btn" data-lang-btn="en">EN</button>
+      <button class="icon-btn" data-lang-btn="sw">SW</button>
+      <a class="btn btn-outline" href="login.html" data-guest-only data-i18n="nav_login">Log in</a>
+      <a class="btn btn-gold" href="register.html" data-guest-only data-i18n="nav_register">Register</a>
+      <a class="btn btn-outline" href="dashboard.html" data-auth-only data-i18n="nav_dashboard">My Account</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="slider" data-slider>
+    <div class="slide is-active" style="background-image:url('images/carrot.webp')"></div>
+    <div class="slide" style="background-image:url('images/harvest.jpg')"></div>
+    <div class="slide" style="background-image:url('images/pigs.1.jpg')"></div>
+    <div class="slide" style="background-image:url('images/ngombe.jpg')"></div>
+    <div class="slide" style="background-image:url('images/price.jpg')"></div>
+    <div class="hero-copy">
+      <div class="container">
+        <div class="eyebrow-plain" data-i18n="hero_eyebrow">Ilemela District, Mwanza</div>
+        <h1 data-i18n="hero_title">Grow more, guess less.</h1>
+        <p data-i18n="hero_body">DAES brings farming education, live weather, and market prices for Ilemela's farmers into one place — in the language you speak.</p>
+        <div class="hero-actions">
+          <a class="btn btn-gold" href="elimu.html" data-i18n="hero_cta_primary">Explore education</a>
+          <a class="btn btn-outline" href="hali-ya-hewa.html" data-i18n="hero_cta_secondary">Check weather</a>
+        </div>
+        <div class="slider-dots" data-slider-dots></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <div class="section-head">
+      <div class="tag" data-i18n="feat_eyebrow">What DAES gives you</div>
+      <h2 data-i18n="feat_1_title">Local farming knowledge</h2>
+    </div>
+    <div class="feature-row">
+      <div class="feature-card">
+        <div class="num">01</div>
+        <h3 data-i18n="feat_1_title">Local farming knowledge</h3>
+        <p data-i18n="feat_1_body">Step-by-step guidance for the crops, livestock and fish farmed around Ilemela, from land preparation to market day.</p>
+      </div>
+      <div class="feature-card">
+        <div class="num">02</div>
+        <h3 data-i18n="feat_2_title">Weather you can plan around</h3>
+        <p data-i18n="feat_2_body">Daily and 5-day forecasts for Ilemela, so you know when to plant, spray or harvest.</p>
+      </div>
+      <div class="feature-card">
+        <div class="num">03</div>
+        <h3 data-i18n="feat_3_title">Real market prices</h3>
+        <p data-i18n="feat_3_body">Up-to-date crop and livestock prices from Mwanza markets, updated by our agriculture desk.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="container two-col">
+    <div>
+      <div class="tag" data-i18n="map_eyebrow">Built for this district</div>
+      <h2 data-i18n="map_title">Rooted in Ilemela, Mwanza</h2>
+      <p data-i18n="map_body">DAES was researched on the ground in Ilemela District. Every lesson, price and forecast is tuned to what actually grows and sells here.</p>
+      <a class="btn btn-primary" href="about.html" data-i18n="about_link">Read our story</a>
+      
+    </div>
+    <div class="map-wrap">
+      <iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps?q=Ilemela+District,+Mwanza,+Tanzania&output=embed"
+        title="Map of Ilemela District, Mwanza"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div>
+      <div class="brand-name" style="color:#eaf2e9;">DAES</div>
+      <p style="color:#b6c7bb; max-width:32ch; margin-top:8px;" data-i18n="foot_rights">Built by students for Ilemela's farmers.</p>
+    </div>
+    <div>
+      <a href="elimu.html" data-i18n="nav_education">Education</a>
+      <a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a>
+      <a href="soko.html" data-i18n="nav_market">Market</a>
+    </div>
+    <div>
+      <a href="mawasiliano.html">Contact agricultural officer</a>
+      <a href="about.html" data-i18n="nav_about">About Us</a>
+      <a href="login.html" data-i18n="nav_login">Log in</a>
+    </div>
+    <div class="foot-bottom" style="grid-column:1/-1;">© 2026 DAES — Digital Agriculture Enhancement System, Ilemela, Mwanza.</div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+</body>
+</html>

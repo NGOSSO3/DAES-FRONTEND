@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Education — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+    <li><a href="elimu.html" class="active" data-i18n="nav_education">Education</a></li>
+    <li><a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a></li>
+    <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+    <li><a href="msaada-ai.html" data-i18n="nav_ai">Ask AI</a></li>
+    <li><a href="about.html" data-i18n="nav_about">About Us</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <button class="icon-btn" data-lang-btn="en">EN</button>
+    <button class="icon-btn" data-lang-btn="sw">SW</button>
+    <a class="btn btn-outline" href="login.html" data-guest-only data-i18n="nav_login">Log in</a>
+    <a class="btn btn-gold" href="register.html" data-guest-only data-i18n="nav_register">Register</a>
+    <a class="btn btn-outline" href="dashboard.html" data-auth-only data-i18n="nav_dashboard">My Account</a>
+  </div>
+</div></nav>
+
+<section>
+  <div class="container">
+    <div class="tag">Education</div>
+    <h1>Farming knowledge for Ilemela</h1>
+    <p>Everything here is written for what's actually grown, reared and caught around Ilemela District — from preparing the land or shed, through to selling at market. Pick a crop, animal or fish below.</p>
+
+    <div class="pill-group" id="categoryPills">
+      <button class="pill is-active" data-cat="all">All</button>
+      <button class="pill" data-cat="crop">Crops</button>
+      <button class="pill" data-cat="livestock">Livestock</button>
+      <button class="pill" data-cat="fish">Fish</button>
+    </div>
+
+    <div class="crop-grid" id="cropGrid"></div>
+
+    <div id="cropDetail" class="crop-detail" style="margin-top:40px;">
+      <button class="btn btn-ghost" id="closeDetail">← Back to list</button>
+      <div id="cropDetailBody" style="margin-top:20px;"></div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="container">
+  <div><div class="brand-name" style="color:#eaf2e9;">DAES</div><p style="color:#b6c7bb;">Built by students for Ilemela's farmers.</p></div>
+  <div><a href="elimu.html">Education</a><a href="hali-ya-hewa.html">Weather</a><a href="soko.html">Market</a></div>
+  <div><a href="mawasiliano.html">Contact agricultural officer</a><a href="about.html">About Us</a><a href="login.html">Log in</a></div>
+  <div class="foot-bottom" style="grid-column:1/-1;">© 2026 DAES — Digital Agriculture Enhancement System, Ilemela, Mwanza.</div>
+</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+<script>
+let CROPS = [];
+let currentCat = "all";
+
+async function loadCrops(){
+  const res = await fetch("data/crops.json");
+  CROPS = await res.json();
+  renderGrid();
+}
+
+function currentLang(){ return localStorage.getItem("daes_lang") || "en"; }
+
+const GUIDE_IMAGES = {
+  mahindi: "images/images.jpg", maharage: "images/images.jpg", mpunga: "images/images.jpg",
+  nyanya: "images/tomato.jpg", mchicha: "images/images.jpg", ngombe: "images/cow (2).jpg",
+  kuku: "images/images.jpg", nguruwe: "images/pigs.1.jpg", mbuzi: "images/cow (2).jpg",
+  kondoo: "images/cow (2).jpg", bata: "images/images.jpg", sangara: "images/images.jpg", sato: "images/images.jpg"
+};
+const NOTE_LINKS = {
+  mahindi: "notes/maize.html", ufuta: "notes/ufuta.html", uwele: "notes/uwele.html", viazivitamu: "notes/viazivitamu.html",
+  bata: "notes/bata.html", cabbage: "notes/cabbage.html", choroko: "notes/choroko.html", cotton: "notes/cotton.html",
+  dengu: "notes/dengu.html", karanga: "notes/karanga.html", kondoo: "notes/kondoo.html", kuku: "notes/kuku.html",
+  kunde: "notes/kunde.html", maharage: "notes/maharage.html", mbuzi: "notes/mbuzi.html", mihogo: "notes/mihogo.html",
+  mpunga: "notes/mpunga.html", mtama: "notes/mtama.html", ngombe: "notes/ngombe.html", nguruwe: "notes/nguruwe.html",
+  onion: "notes/onion.html", nyanya: "notes/tomato.html", sato: "notes/sato.html", sangara: "notes/sangara.html"
+};
+
+function guideImage(c){ return GUIDE_IMAGES[c.id] || "images/images.jpg"; }
+
+function renderGrid(){
+  const grid = document.getElementById("cropGrid");
+  grid.innerHTML = "";
+  const lang = currentLang();
+  CROPS.filter(c => currentCat === "all" || c.category === currentCat).forEach(c => {
+    const hasNote = Boolean(NOTE_LINKS[c.id]);
+    const div = document.createElement(hasNote ? "a" : "div");
+    div.className = "crop-card";
+    if (hasNote) div.href = NOTE_LINKS[c.id];
+    else {
+      div.setAttribute("role", "button");
+      div.setAttribute("tabindex", "0");
+    }
+    div.setAttribute("aria-label", `${lang === "sw" ? "Mwongozo wa " : "Guide for "}${lang === "sw" ? c.name_sw : c.name_en}`);
+    div.innerHTML = `<img class="crop-card-image" src="${guideImage(c)}" alt="${lang === "sw" ? c.name_sw : c.name_en}" loading="lazy"><h3>${lang === "sw" ? c.name_sw : c.name_en}</h3><p>${lang === "sw" ? c.summary_sw : c.summary_en}</p>`;
+    const openGuide = () => {
+      if (NOTE_LINKS[c.id]) window.location.href = NOTE_LINKS[c.id];
+      else openDetail(c.id);
+    };
+    if (!hasNote) {
+      div.addEventListener("click", openGuide);
+      div.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openGuide(); }
+      });
+    }
+    grid.appendChild(div);
+  });
+}
+
+function openDetail(id){
+  const c = CROPS.find(x => x.id === id);
+  const lang = currentLang();
+  document.getElementById("cropGrid").style.display = "none";
+  document.getElementById("categoryPills").style.display = "none";
+  const detail = document.getElementById("cropDetail");
+  detail.classList.add("is-open");
+  const body = document.getElementById("cropDetailBody");
+  body.innerHTML = `
+    <div class="guide-hero"><img src="${guideImage(c)}" alt="${lang === "sw" ? c.name_sw : c.name_en}"><div class="guide-hero-copy"><div class="tag">${c.category}</div><h1>${lang === "sw" ? c.name_sw : c.name_en}</h1><p>${lang === "sw" ? c.summary_sw : c.summary_en}</p></div></div>
+    <div class="guide-intro"><strong>${lang === "sw" ? "Safari ya mkulima" : "Your production journey"}</strong><span>${lang === "sw" ? "Fuata hatua hizi kutoka maandalizi hadi kuuza kwa faida." : "Follow each stage from preparation to a better market sale."}</span></div>
+    <div class="stages">
+      ${c.stages.map((s, index) => `<div class="stage"><div class="stage-number">${index + 1}</div><div><h4>${lang === "sw" ? s.title_sw : s.title_en}</h4><p>${lang === "sw" ? s.text_sw : s.text_en}</p></div></div>`).join("")}
+    </div>`;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("closeDetail").addEventListener("click", () => {
+  document.getElementById("cropDetail").classList.remove("is-open");
+  document.getElementById("cropGrid").style.display = "";
+  document.getElementById("categoryPills").style.display = "";
+});
+
+document.querySelectorAll("#categoryPills .pill").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#categoryPills .pill").forEach(b => b.classList.remove("is-active"));
+    btn.classList.add("is-active");
+    currentCat = btn.getAttribute("data-cat");
+    renderGrid();
+  });
+});
+
+document.querySelectorAll("[data-lang-btn]").forEach(btn => {
+  btn.addEventListener("click", () => setTimeout(renderGrid, 0));
+});
+
+loadCrops();
+</script>
+</body></html>

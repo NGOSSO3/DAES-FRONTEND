@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="elimu.html">Education</a></li>
+    <li><a href="hali-ya-hewa.html">Weather</a></li>
+    <li><a href="soko.html">Market</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <a class="icon-btn" href="#" data-logout>Log out</a>
+  </div>
+</div></nav>
+
+<div class="shell">
+  <aside class="side">
+    <a href="#" class="active" data-tab="overview">Overview</a>
+    <a href="#" data-tab="notifications">WhatsApp notifications</a>
+    <a href="#" data-tab="notification-history">Notification history</a>
+    <a href="#" data-tab="feedback">Feedback to admin</a>
+    <a href="#" data-tab="contact">My messages to officer</a>
+  </aside>
+  <main class="main-panel">
+    <h1 id="welcomeName">My account</h1>
+
+    <div class="panel" data-panel="overview">
+      <h3>Account details</h3>
+      <p id="userDetails">Loading...</p>
+    </div>
+
+    <div class="panel" data-panel="notifications" style="display:none;">
+      <h3>WhatsApp weather &amp; market alerts</h3>
+      <p>Get weather warnings and market price changes sent to your WhatsApp number.</p>
+      <form id="notifForm">
+        <div class="field"><label for="waNumber">WhatsApp number</label><input id="waNumber" placeholder="+255 6xx xxx xxx"></div>
+        <div class="field"><label><input type="checkbox" id="waWeather" checked style="width:auto; margin-right:8px;">Weather alerts</label></div>
+        <div class="field"><label><input type="checkbox" id="waMarket" checked style="width:auto; margin-right:8px;">Market price updates</label></div>
+        <button class="btn btn-primary" type="submit">Save preferences</button>
+        <button class="btn btn-ghost" type="button" id="testWhatsApp">Send test WhatsApp</button>
+        <div id="notifMsg"></div>
+      </form>
+    </div>
+
+    <div class="panel" data-panel="notification-history" style="display:none;">
+      <h3>Notification history</h3>
+      <table><thead><tr><th>Type</th><th>Message</th><th>Status</th><th>Date</th></tr></thead><tbody id="notificationRows"><tr><td colspan="4">Loading...</td></tr></tbody></table>
+    </div>
+
+    <div class="panel" data-panel="feedback" style="display:none;">
+      <h3>Send feedback or an idea to the admin</h3>
+      <form id="feedbackForm">
+        <div class="field"><label for="fbMessage">Your feedback</label><textarea id="fbMessage" required></textarea></div>
+        <button class="btn btn-primary" type="submit">Submit feedback</button>
+        <div id="fbMsg"></div>
+      </form>
+    </div>
+
+    <div class="panel" data-panel="contact" style="display:none;">
+      <h3>My messages to the agricultural officer</h3>
+      <table>
+        <thead><tr><th>Topic</th><th>Message</th><th>Status</th><th>Sent</th></tr></thead>
+        <tbody id="contactRows"><tr><td colspan="4">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+if (!localStorage.getItem("daes_token")) window.location.href = "login.html";
+
+const user = JSON.parse(localStorage.getItem("daes_user") || "{}");
+document.getElementById("welcomeName").textContent = `Welcome, ${user.full_name || "Farmer"}`;
+document.getElementById("userDetails").textContent = `${user.email || ""} · ${user.village || "Ilemela"}`;
+
+document.querySelectorAll(".side a[data-tab]").forEach(a => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.querySelectorAll(".side a").forEach(x => x.classList.remove("active"));
+    a.classList.add("active");
+    document.querySelectorAll(".main-panel .panel").forEach(p => p.style.display = "none");
+    document.querySelector(`[data-panel="${a.getAttribute("data-tab")}"]`).style.display = "";
+    if (a.getAttribute("data-tab") === "contact") loadContacts();
+    if (a.getAttribute("data-tab") === "notification-history") loadNotificationHistory();
+  });
+});
+
+async function loadNotificationPreferences(){
+  try {
+    const data = await apiRequest("/notifications/preferences", { auth: true });
+    waNumber.value = data.whatsapp_number || "";
+    waWeather.checked = data.notify_weather;
+    waMarket.checked = data.notify_market;
+  } catch (err) { /* preferences are optional */ }
+}
+
+async function loadNotificationHistory(){
+  const rows = document.getElementById("notificationRows");
+  try {
+    const data = await apiRequest("/notifications/history", { auth: true });
+    rows.innerHTML = data.notifications.map(item => `<tr><td>${item.kind}</td><td>${item.message}</td><td>${item.status}</td><td>${new Date(item.created_at).toLocaleString()}</td></tr>`).join("") || "<tr><td colspan='4'>No notifications yet.</td></tr>";
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="4">Could not load history: ${err.message}</td></tr>`;
+  }
+}
+
+document.getElementById("notifForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("notifMsg");
+  try {
+    await apiRequest("/notifications/preferences", { method: "PUT", auth: true, body: { whatsapp_number: waNumber.value, notify_weather: waWeather.checked, notify_market: waMarket.checked } });
+    msg.className = "form-msg ok";
+    msg.textContent = "WhatsApp preferences saved.";
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+
+document.getElementById("testWhatsApp").addEventListener("click", async () => {
+  const msg = document.getElementById("notifMsg");
+  try {
+    await apiRequest("/notifications/test", { method: "POST", auth: true });
+    msg.className = "form-msg ok"; msg.textContent = "Test WhatsApp sent.";
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+
+loadNotificationPreferences();
+
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("fbMsg");
+  try {
+    await DaesAPI.sendFeedback({ message: fbMessage.value });
+    msg.className = "form-msg ok"; msg.textContent = "Thanks — sent to the admin.";
+    document.getElementById("feedbackForm").reset();
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+
+async function loadContacts(){
+  const rows = document.getElementById("contactRows");
+  try {
+    const data = await DaesAPI.listContacts();
+    rows.innerHTML = data.contacts.map(c => `<tr><td>${c.topic}</td><td>${c.message}</td><td>${c.status}</td><td>${new Date(c.created_at).toLocaleDateString()}</td></tr>`).join("") || "<tr><td colspan='4'>No messages yet.</td></tr>";
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="4">Could not load: ${err.message}</td></tr>`;
+  }
+}
+</script>
+</body></html>

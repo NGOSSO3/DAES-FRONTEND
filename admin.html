@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Admin</small></span></a>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <a class="icon-btn" href="#" data-logout>Log out</a>
+  </div>
+</div></nav>
+
+<div class="shell">
+  <aside class="side">
+    <a href="#" class="active" data-tab="stats">Dashboard</a>
+    <a href="#" data-tab="users">Users</a>
+    <a href="#" data-tab="prices">Market prices</a>
+    <a href="#" data-tab="feedback">Feedback</a>
+    <a href="#" data-tab="contacts">Officer requests</a>
+    <a href="#" data-tab="officers">Agricultural officers</a>
+  </aside>
+  <main class="main-panel">
+    <h1>Admin dashboard</h1>
+
+    <div data-panel="stats">
+      <div class="stat-row">
+        <div class="stat"><div class="n" id="statUsers">–</div><div class="l">Registered farmers</div></div>
+        <div class="stat"><div class="n" id="statFeedback">–</div><div class="l">Feedback items</div></div>
+        <div class="stat"><div class="n" id="statContacts">–</div><div class="l">Open officer requests</div></div>
+      </div>
+      <div class="panel">
+        <h3>What this panel controls</h3>
+        <p>Add or update market prices, review farmer feedback, and respond to requests sent to the agricultural officer. Crop/livestock education content lives in <code>frontend/data/crops.json</code> — edit that file directly and it updates the Education page for everyone.</p>
+      </div>
+    </div>
+
+    <div data-panel="users" style="display:none;">
+      <div class="panel">
+        <h3>Registered users</h3>
+        <table><thead><tr><th>Name</th><th>Email</th><th>Village</th><th>Joined</th></tr></thead>
+        <tbody id="userRows"><tr><td colspan="4">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <div data-panel="prices" style="display:none;">
+      <div class="panel">
+        <h3>Add a market price</h3>
+        <form id="priceForm">
+          <div class="field"><label for="product">Product</label><input id="product" required></div>
+          <div class="field"><label for="unit">Unit</label><input id="unit" placeholder="e.g. kg, debe, gunia" required></div>
+          <div class="field"><label for="price">Price (TZS)</label><input id="price" type="number" required></div>
+          <div class="field"><label for="market">Market</label><input id="market" placeholder="e.g. Ilemela Market" required></div>
+          <button class="btn btn-primary" type="submit">Save price</button>
+          <div id="priceMsg"></div>
+        </form>
+      </div>
+    </div>
+
+    <div data-panel="feedback" style="display:none;">
+      <div class="panel">
+        <h3>Farmer feedback</h3>
+        <table><thead><tr><th>From</th><th>Message</th><th>Sent</th></tr></thead>
+        <tbody id="feedbackRows"><tr><td colspan="3">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <div data-panel="contacts" style="display:none;">
+      <div class="panel">
+        <h3>Requests to the agricultural officer</h3>
+        <table><thead><tr><th>From</th><th>Topic</th><th>Message</th><th>Status</th></tr></thead>
+        <tbody id="contactRowsAdmin"><tr><td colspan="4">Loading...</td></tr></tbody></table>
+      </div>
+    </div>
+
+    <div data-panel="officers" style="display:none;">
+      <div class="panel">
+        <h3>Agricultural officers</h3>
+        <p>Set each officer's name and Tanzania phone number. The saved details appear on the contact page.</p>
+        <form id="officersForm"><div id="officerAdminRows"></div><button class="btn btn-primary" type="submit">Save officer details</button><div id="officerMsg"></div></form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/api.js"></script>
+<script>
+if (!localStorage.getItem("daes_token")) window.location.href = "login.html";
+
+document.querySelectorAll(".side a[data-tab]").forEach(a => {
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.querySelectorAll(".side a").forEach(x => x.classList.remove("active"));
+    a.classList.add("active");
+    document.querySelectorAll(".main-panel > div[data-panel]").forEach(p => p.style.display = "none");
+    const tab = a.getAttribute("data-tab");
+    document.querySelector(`[data-panel="${tab}"]`).style.display = "";
+    if (tab === "users") loadUsers();
+    if (tab === "feedback") loadFeedback();
+    if (tab === "contacts") loadContacts();
+    if (tab === "officers") loadAdminOfficers();
+  });
+});
+
+async function loadStats(){
+  try {
+    const s = await DaesAPI.adminStats();
+    statUsers.textContent = s.users; statFeedback.textContent = s.feedback; statContacts.textContent = s.open_contacts;
+  } catch (err) { /* backend offline */ }
+}
+
+async function loadUsers(){
+  const rows = document.getElementById("userRows");
+  try {
+    const data = await DaesAPI.adminUsers();
+    rows.innerHTML = data.users.map(user => `<tr><td>${user.full_name}</td><td>${user.email}</td><td>${user.village || "-"}</td><td>${new Date(user.created_at).toLocaleDateString()}</td></tr>`).join("") || "<tr><td colspan='4'>No registered farmers yet.</td></tr>";
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="4">Could not load users: ${err.message}</td></tr>`;
+  }
+}
+
+async function loadFeedback(){
+  const rows = document.getElementById("feedbackRows");
+  try {
+    const data = await DaesAPI.listFeedback();
+    rows.innerHTML = data.feedback.map(item => `<tr><td>${item.from}</td><td>${item.message}</td><td>${new Date(item.created_at).toLocaleDateString()}</td></tr>`).join("") || "<tr><td colspan='3'>No feedback yet.</td></tr>";
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="3">Could not load feedback: ${err.message}</td></tr>`;
+  }
+}
+
+async function loadContacts(){
+  const rows = document.getElementById("contactRowsAdmin");
+  try {
+    const data = await DaesAPI.listContacts();
+    rows.innerHTML = data.contacts.map(item => `<tr><td>${item.from}</td><td>${item.topic}</td><td>${item.message}</td><td>${item.status}</td></tr>`).join("") || "<tr><td colspan='4'>No officer requests yet.</td></tr>";
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="4">Could not load requests: ${err.message}</td></tr>`;
+  }
+}
+
+async function loadAdminOfficers(){
+  const rows = document.getElementById("officerAdminRows");
+  try {
+    const data = await apiRequest("/admin/officers", { auth: true });
+    rows.innerHTML = data.officers.map(officer => `<div class="field"><label>${officer.department}</label><input data-officer-code="${officer.code}" data-officer-field="name" value="${officer.name || ""}" placeholder="Officer name"><input data-officer-code="${officer.code}" data-officer-field="phone" value="${officer.phone || ""}" placeholder="WhatsApp / phone, e.g. +255712345678"></div>`).join("");
+  } catch (err) {
+    rows.innerHTML = `<div class="form-msg err">Could not load officers: ${err.message}</div>`;
+  }
+}
+
+document.getElementById("officersForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const grouped = {};
+  document.querySelectorAll("[data-officer-code]").forEach(input => {
+    const code = input.getAttribute("data-officer-code");
+    grouped[code] = grouped[code] || { code };
+    grouped[code][input.getAttribute("data-officer-field")] = input.value.trim();
+  });
+  const msg = document.getElementById("officerMsg");
+  try {
+    await apiRequest("/admin/officers", { method: "PUT", body: { officers: Object.values(grouped) }, auth: true });
+    msg.className = "form-msg ok"; msg.textContent = "Officer details saved.";
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+
+document.getElementById("priceForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("priceMsg");
+  try {
+    await DaesAPI.addMarketPrice({ product: product.value, unit: unit.value, price: Number(price.value), market: market.value });
+    msg.className = "form-msg ok"; msg.textContent = "Price saved.";
+    document.getElementById("priceForm").reset();
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+
+loadStats();
+</script>
+</body></html>

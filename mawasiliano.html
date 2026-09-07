@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Agricultural Officer — DAES</title>
+<link rel="stylesheet" href="css/styles.css">
+<style>
+  .officer-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+  .officer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}
+  .officer-card h3{margin-bottom:4px}.officer-card p{font-size:.88rem;margin:0 0 14px}
+  .officer-actions{display:flex;gap:8px;flex-wrap:wrap}.officer-actions .btn{font-size:.85rem;padding:8px 12px}
+  .officer-actions .is-disabled{opacity:.5;pointer-events:none}
+  @media(max-width:650px){.officer-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="site-nav"><div class="container">
+  <a class="brand" href="index.html"><span class="brand-mark">D</span><span class="brand-name">DAES<small>Ilemela · Mwanza</small></span></a>
+  <ul class="nav-links">
+    <li><a href="index.html" data-i18n="nav_home">Home</a></li>
+    <li><a href="elimu.html" data-i18n="nav_education">Education</a></li>
+    <li><a href="hali-ya-hewa.html" data-i18n="nav_weather">Weather</a></li>
+    <li><a href="soko.html" data-i18n="nav_market">Market</a></li>
+    <li><a href="msaada-ai.html" data-i18n="nav_ai">Ask AI</a></li>
+    <li><a href="about.html" data-i18n="nav_about">About Us</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="icon-btn" data-theme-toggle>🌙 Dark</button>
+    <button class="icon-btn" data-lang-btn="en">EN</button>
+    <button class="icon-btn" data-lang-btn="sw">SW</button>
+    <a class="btn btn-outline" href="login.html" data-guest-only>Log in</a>
+    <a class="btn btn-outline" href="dashboard.html" data-auth-only>My Account</a>
+  </div>
+</div></nav>
+
+<section>
+  <div class="container" style="max-width:640px;">
+    <div class="tag">Extension support</div>
+    <h1>Contact an agricultural officer</h1>
+    <p>Use this for anything the education pages or AI assistant can't fully answer — a sick animal, a crop disease you can't identify, or advice specific to your plot. A registered agricultural officer reviews these and responds.</p>
+    <div class="officer-grid" id="officerGrid"></div>
+    <div class="card" style="max-width:100%;">
+      <form id="contactForm">
+        <div class="field"><label for="topic">Topic</label>
+          <select id="topic" required>
+            <option value="">Select a topic</option>
+            <option value="Vegetables / Mbogamboga">Vegetables / Mbogamboga</option>
+            <option value="Crop production / Kilimo">Crop production / Kilimo</option>
+            <option value="Livestock / Mifugo">Livestock / Mifugo</option>
+            <option value="Fish farming / Samaki">Fish farming / Samaki</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field"><label for="message">Describe the issue</label><textarea id="message" required></textarea></div>
+        <div class="field"><label for="officerId">Choose an officer</label><select id="officerId" required></select></div>
+        <button class="btn btn-primary" type="submit" style="width:100%;">Send to officer</button>
+        <div id="formMsg"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer><div class="container">
+  <div><div class="brand-name" style="color:#eaf2e9;">DAES</div><p style="color:#b6c7bb;">Built by students for Ilemela's farmers.</p></div>
+  <div><a href="elimu.html">Education</a><a href="hali-ya-hewa.html">Weather</a><a href="soko.html">Market</a></div>
+  <div><a href="mawasiliano.html">Contact agricultural officer</a><a href="about.html">About Us</a><a href="login.html">Log in</a></div>
+  <div class="foot-bottom" style="grid-column:1/-1;">© 2026 DAES — Digital Agriculture Enhancement System, Ilemela, Mwanza.</div>
+</div></footer>
+
+<script src="js/main.js"></script>
+<script src="js/lang.js"></script>
+<script src="js/api.js"></script>
+<script>
+let DAES_OFFICERS = [];
+function phoneDigits(phone){ return (phone || "").replace(/[^0-9]/g, ""); }
+
+function renderOfficers(){
+  const grid = document.getElementById("officerGrid");
+  const select = document.getElementById("officerId");
+  select.innerHTML = '<option value="">Select an officer</option>';
+  DAES_OFFICERS.forEach(officer => {
+    const phone = phoneDigits(officer.phone);
+    const card = document.createElement("article");
+    card.className = "officer-card";
+    card.innerHTML = `<h3>${officer.department}</h3><p>${officer.name || "Officer name not set"}${phone ? " · " + officer.phone : " · Admin has not added a phone yet"}</p><div class="officer-actions"><a class="btn btn-primary ${phone ? "" : "is-disabled"}" href="${phone ? "https://wa.me/" + phone : "#"}" target="_blank" rel="noopener">WhatsApp</a><a class="btn btn-outline ${phone ? "" : "is-disabled"}" href="${phone ? "tel:" + officer.phone : "#"}">Call</a></div>`;
+    grid.appendChild(card);
+    const option = document.createElement("option");
+    option.value = officer.id;
+    option.textContent = officer.department + " - " + officer.name;
+    select.appendChild(option);
+  });
+}
+
+async function loadOfficers(){
+  try {
+    const response = await fetch("http://localhost:5000/api/officers");
+    if (!response.ok) throw new Error(`Request failed (${response.status})`);
+    const data = await response.json();
+    DAES_OFFICERS = data.officers;
+    renderOfficers();
+  } catch (err) {
+    document.getElementById("officerGrid").innerHTML = `<div class="form-msg err">Could not load officers: ${err.message}</div>`;
+  }
+}
+
+loadOfficers();
+
+document.getElementById("contactForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("formMsg");
+  msg.className = "form-msg"; msg.textContent = "";
+  if (!localStorage.getItem("daes_token")){
+    msg.className = "form-msg err"; msg.textContent = "Please log in first.";
+    return;
+  }
+  try {
+    const officer = DAES_OFFICERS.find(item => item.id === officerId.value);
+    await DaesAPI.contactOfficer({ topic: topic.value, message: message.value, officer: officer ? officer.name : "" });
+    const phone = phoneDigits(officer && officer.phone);
+    if (phone) {
+      const text = `DAES request - ${topic.value}\n\n${message.value}`;
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+    }
+    msg.className = "form-msg ok"; msg.textContent = phone ? "Request saved. WhatsApp has opened for the officer." : "Request saved. Add the officer's phone number to enable WhatsApp.";
+    document.getElementById("contactForm").reset();
+  } catch (err) {
+    msg.className = "form-msg err"; msg.textContent = err.message;
+  }
+});
+</script>
+</body></html>
