@@ -29,22 +29,69 @@
 <section>
   <div class="container">
     <div class="tag">Weather</div>
-    <h1>Ilemela weather</h1>
-    <p>Live conditions and a 5-day outlook, powered by the OpenWeather API through the DAES backend.</p>
+    <h1>Hali ya Hewa </h1>
+    <p>Utabiri huu unatumia eneo lako halisi ili kukupa hali ya hewa sahihi kwa mji au wilaya yako, popote Tanzania</p>
 
-    <div class="panel">
+    <div class="locate-bar">
+      <button class="btn btn-primary" id="btnLocate">Tumia Eneo Langu Sasa</button>
+      <input type="text" id="locateInput" placeholder="Au andika jina la mji/wilaya yako, mfano: Mwanza">
+      <button class="btn btn-outline" id="btnSearch">Tafuta</button>
+    </div>
+    <div class="locate-status" id="locateStatus">Bonyeza "Tumia Eneo Langu Sasa" au andika mji wako kuanza.</div>
+    <div class="locate-results" id="locateResults"></div>
+
+    <div class="panel" style="margin-top:22px;">
+      <h3 id="weatherLocationLabel">Eneo: —</h3>
       <div class="weather-now" id="weatherNow">
-        <div class="weather-icon" id="weatherIcon" aria-label="Current weather">☀️</div>
         <div class="weather-temp">--°C</div>
         <div>
-          <div id="weatherDesc" style="font-weight:600;">Loading...</div>
+          <div id="weatherDesc" style="font-weight:600;">Chagua eneo lako kwanza</div>
           <div id="weatherMeta" style="color:var(--text-soft); font-size:.9rem;"></div>
         </div>
       </div>
     </div>
 
-    <h2 style="margin-top:36px;">5-day forecast</h2>
+    <h2 style="margin-top:36px;">Utabiri wa Siku 5</h2>
     <div class="forecast-row" id="forecastRow"></div>
+
+    <!-- ================= DYNAMIC WEATHER-BASED FARMING ADVICE ================= -->
+    <h2 style="margin-top:40px;">Ushauri wa Kilimo kwa Hali ya Hewa ya Eneo Lako Sasa</h2>
+    <p style="margin-top:-8px;">Ushauri huu unabadilika kila ukibadilisha eneo — unategemea joto na kiasi cha mvua kinachotarajiwa kwa siku 5 zijazo za eneo ulilochagua.</p>
+    <div class="feature-row" id="adviceGrid">
+      <div class="feature-card"><p>Chagua eneo lako hapo juu kupata ushauri.</p></div>
+    </div>
+    <p style="margin-top:18px;">Kwa ushauri zaidi uliolengana na zao au eneo lako mahususi, tumia <a href="msaada-ai.html" style="color:var(--green-700); font-weight:600;">Msaidizi wa AI</a> au <a href="mawasiliano.html" style="color:var(--green-700); font-weight:600;">wasiliana na afisa kilimo</a> moja kwa moja.</p>
+
+    <!-- ================= EL NIÑO ADVISORY ================= -->
+    <div class="elnino-banner" style="margin-top:44px;">
+      <h2>⚠️ TAHADHARI: El Niño Yenye Nguvu Kubwa — Mvua za Vuli 2026</h2>
+      <div class="updated">Chanzo: Mamlaka ya Hali ya Hewa Tanzania (TMA), tangazo la Agosti 18, 2026. Angalia www.meteo.go.tz kwa utabiri kamili wa wilaya yako (TMA imeandaa utabiri mahususi kwa wilaya 86).</div>
+      <p>TMA imethibitisha kuwa El Niño yenye nguvu kubwa itaathiri kwa kiasi kikubwa mvua za msimu wa Vuli (Oktoba–Desemba 2026), ikisababishwa na joto la juu ya wastani la Bahari ya Pasifiki na Bahari ya Hindi. Maeneo yanayotarajiwa kupata mvua za juu ya wastani hadi wastani ni pamoja na: Pwani ya Kaskazini (Dar es Salaam, Tanga, Pwani, Mafia), Unguja na Pemba, Kaskazini mwa Morogoro, Nyanda za Juu Kaskazini Mashariki (Arusha, Manyara, Kilimanjaro), <strong>Ukanda wa Ziwa Victoria (Kagera, Geita, Mwanza, Shinyanga, Simiyu, Mara — ikiwemo Ilemela)</strong>, na Kakonko/Kibondo Kigoma Kaskazini.</p>
+      <p><strong>Muhimu kwa Ilemela/Mwanza:</strong> Ukanda wa Ziwa Victoria ni miongoni mwa maeneo ya kwanza kutarajiwa kupata mvua hizi — kuanzia wiki ya nne ya Septemba hadi wiki ya kwanza ya Oktoba 2026, kabla ya kusambaa maeneo mengine mwezi Oktoba. Mvua zinatarajiwa kuongezeka zaidi Novemba, na kuendelea (nje ya msimu wa kawaida) hadi Januari 2027.</p>
+      <div class="elnino-grid">
+        <div class="elnino-box">
+          <h4>🌊 Hatari Zinazotarajiwa</h4>
+          <ul style="margin-bottom:0;">
+            <li>Mafuriko na maporomoko ya ardhi maeneo hatarishi</li>
+            <li>Unyevu kupita kiasi kwenye udongo unaoathiri mizizi ya mazao</li>
+            <li>Ongezeko la magonjwa ya mazao yanayosababishwa na kuvu, bakteria na virusi</li>
+            <li>Uharibifu wa miundombinu (barabara, madaraja, mifereji)</li>
+            <li>Upotevu wa mazao baada ya kuvuna kama mvua za muda mrefu zitaingilia uvunaji</li>
+          </ul>
+        </div>
+        <div class="elnino-box">
+          <h4>✅ Hatua za Tahadhari kwa Wakulima</h4>
+          <ul style="margin-bottom:0;">
+            <li>Safisha mifereji ya maji shambani na karibu na banda/zizi kabla ya Oktoba</li>
+            <li>Epuka kupanda mazao kwenye mabonde yenye historia ya mafuriko msimu huu</li>
+            <li>Andaa mifumo ya kutoa maji ya ziada (matuta, mifereji) kwenye mashamba ya mabondeni</li>
+            <li>Panga uvunaji mapema pale inapowezekana kuepuka mvua za ziada za Novemba-Januari</li>
+            <li>Hamishia mifugo na vifaa muhimu mbali na maeneo yanayoweza kufurika</li>
+            <li>Fuatilia dalili za magonjwa ya ukungu kwenye mazao mara kwa mara zaidi ya kawaida</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -60,39 +107,132 @@
 <script> window.DAES_API_BASE ="https://daes-backend.onrender.com/api";</script>
 <script src="js/api.js"></script>
 <script>
-function weatherIcon(description){
-  const text = (description || "").toLowerCase();
-  if (text.includes("thunder")) return "⛈️";
-  if (text.includes("rain") || text.includes("drizzle")) return "🌧️";
-  if (text.includes("snow")) return "❄️";
-  if (text.includes("cloud")) return "☁️";
-  if (text.includes("mist") || text.includes("fog")) return "🌫️";
-  return "☀️";
-}
+let currentLoc = null; // {lat, lon, name}
 
-async function loadWeather(){
+function setStatus(text){ document.getElementById("locateStatus").textContent = text; }
+
+async function loadWeatherFor(lat, lon, name){
+  currentLoc = { lat, lon, name };
+  document.getElementById("weatherLocationLabel").textContent = `📍 Eneo: ${name}`;
+  setStatus(`Inaonyesha hali ya hewa kwa ${name}.`);
   try {
-    const now = await DaesAPI.weatherNow("Ilemela");
-    document.getElementById("weatherIcon").textContent = weatherIcon(now.description);
-    document.getElementById("weatherIcon").setAttribute("aria-label", now.description);
+    const now = await DaesAPI.weatherNow(lat, lon, name);
     document.querySelector(".weather-temp").textContent = `${Math.round(now.temp)}°C`;
     document.getElementById("weatherDesc").textContent = now.description;
-    document.getElementById("weatherMeta").textContent = `💧 Humidity ${now.humidity}% · 🌬️ Wind ${now.wind_speed} m/s · ${now.district}`;
+    document.getElementById("weatherMeta").textContent = `Unyevu ${now.humidity}% · Upepo ${now.wind_speed} m/s`;
   } catch (err) {
-    document.getElementById("weatherDesc").textContent = "Could not load live weather (backend offline?)";
+    document.getElementById("weatherDesc").textContent = "Imeshindikana kupata hali ya hewa (backend haipo mtandaoni?)";
   }
   try {
-    const forecast = await DaesAPI.weatherForecast("Ilemela");
+    const forecast = await DaesAPI.weatherForecast(lat, lon, name);
     const row = document.getElementById("forecastRow");
     row.innerHTML = forecast.days.map(d => `
       <div class="forecast-day">
-        <div style="font-weight:600;">${d.day || d.label}</div>
-        <div class="forecast-icon" aria-label="${d.description}">${weatherIcon(d.description)}</div>
+        <div style="font-weight:600;">${d.label}</div>
         <div style="font-size:1.6rem; margin:6px 0;">${Math.round(d.temp)}°C</div>
         <div style="color:var(--text-soft); font-size:.85rem;">${d.description}</div>
+        ${d.rain_mm > 5 ? `<div class="rain-flag">🌧️ ${d.rain_mm}mm</div>` : ""}
       </div>`).join("");
+    renderAdvice(name, forecast.days);
   } catch (err) { /* forecast optional */ }
 }
-loadWeather();
+
+function renderAdvice(name, days){
+  const grid = document.getElementById("adviceGrid");
+  if (!days || !days.length){
+    grid.innerHTML = `<div class="feature-card"><p>Ushauri hautapatikana kwa sasa — jaribu tena baadaye.</p></div>`;
+    return;
+  }
+
+  const totalRain = days.reduce((sum, d) => sum + (d.rain_mm || 0), 0);
+  const heavyRainDays = days.filter(d => (d.rain_mm || 0) >= 10).length;
+  const anyRainDays = days.filter(d => (d.rain_mm || 0) > 0).length;
+  const avgTemp = days.reduce((sum, d) => sum + d.temp, 0) / days.length;
+
+  let level, cropAdvice, animalAdvice, fishAdvice;
+
+  if (heavyRainDays >= 2 || totalRain >= 40) {
+    level = `🌧️ Mvua Nyingi Zinatarajiwa ${name} — siku ${heavyRainDays} za mvua kubwa katika siku 5 zijazo (jumla ya ${totalRain.toFixed(0)}mm)`;
+    cropAdvice = "Chelewesha upandaji wa mazao yanayoshindwa kustahimili maji mengi, tengeneza matuta au mifereji ya kutoa maji ya ziada shambani, na fuatilia dalili za magonjwa ya ukungu mara kwa mara zaidi ya kawaida.";
+    animalAdvice = "Hakikisha banda/zizi lina sakafu kavu na mifereji mizuri, hamisha mifugo mbali na maeneo ya mabondeni yanayoweza kufurika, na weka chakula cha mifugo mahali pasipoweza kulowana.";
+    fishAdvice = "Angalia kingo za bwawa/vizimba mara kwa mara — mvua kubwa zinaweza kusababisha bwawa kufurika na samaki kutoroka; imarisha kingo kabla mvua hazijaongezeka.";
+  } else if (anyRainDays >= 1 && totalRain < 40) {
+    level = `🌦️ Mvua za Wastani Zinatarajiwa ${name} — jumla ya ${totalRain.toFixed(0)}mm katika siku 5 zijazo`;
+    cropAdvice = "Hali nzuri kwa upandaji wa mazao mengi — hakikisha shamba lina mifereji ya kutosha kama mvua zitaongezeka ghafla, na endelea kufuatilia hali ya udongo.";
+    animalAdvice = "Hali ya kawaida kwa mifugo — hakikisha maji safi na chakula vinapatikana, angalia dalili za baridi kwa wanyama wachanga hasa nyakati za usiku.";
+    fishAdvice = "Kiwango cha maji kitaongezeka kidogo — angalia mara kwa mara lakini hakuna hatua za dharura zinazohitajika kwa sasa.";
+  } else if (avgTemp >= 28) {
+    level = `☀️ Hali ya Joto na Ukavu ${name} — wastani wa ${avgTemp.toFixed(0)}°C, mvua kidogo au hakuna katika siku 5 zijazo`;
+    cropAdvice = "Ongeza umwagiliaji hasa kwa miche michanga, tumia matandazo (mulching) kuhifadhi unyevu wa udongo, na panda nyakati za asubuhi au jioni kupunguza mkazo wa joto kwa mimea.";
+    animalAdvice = "Hakikisha maji ya kutosha yanapatikana muda wote kwani mifugo hunywa zaidi wakati wa joto, na toa kivuli cha kutosha hasa muda wa mchana.";
+    fishAdvice = "Fuatilia joto la maji ya bwawa — joto kali linaweza kupunguza oksijeni majini; ongeza kina cha maji kama inawezekana kupunguza mabadiliko ya joto.";
+  } else {
+    level = `⛅ Hali ya Wastani ${name} — wastani wa ${avgTemp.toFixed(0)}°C, mvua kidogo katika siku 5 zijazo`;
+    cropAdvice = "Hali nzuri kwa shughuli nyingi za shambani — palizi, upandaji, au uvunaji vinaweza kuendelea kama kawaida.";
+    animalAdvice = "Hali ya kawaida kwa mifugo — endelea na ratiba ya kawaida ya ulishaji na ukaguzi wa afya.";
+    fishAdvice = "Hali ya kawaida kwa ufugaji wa samaki — endelea na ufuatiliaji wa kawaida wa ubora wa maji.";
+  }
+
+  grid.innerHTML = `
+    <div class="feature-card" style="grid-column:1/-1;"><h3 style="margin-bottom:6px;">${level}</h3></div>
+    <div class="feature-card"><div class="num">🌾</div><h3>Mazao Shambani</h3><p>${cropAdvice}</p></div>
+    <div class="feature-card"><div class="num">🐄</div><h3>Mifugo</h3><p>${animalAdvice}</p></div>
+    <div class="feature-card"><div class="num">🐟</div><h3>Ufugaji wa Samaki</h3><p>${fishAdvice}</p></div>
+  `;
+}
+
+document.getElementById("btnLocate").addEventListener("click", () => {
+  if (!navigator.geolocation){
+    setStatus("Kivinjari chako hakiwezi kutambua eneo — tafadhali andika mji wako.");
+    return;
+  }
+  setStatus("Inatafuta eneo lako...");
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const { latitude, longitude } = pos.coords;
+    try {
+      const place = await DaesAPI.reverseGeocode(latitude, longitude);
+      const label = place.state ? `${place.name}, ${place.state}` : place.name;
+      loadWeatherFor(latitude, longitude, label);
+    } catch (err) {
+      loadWeatherFor(latitude, longitude, "Eneo Lako");
+    }
+  }, (error) => {
+    setStatus("Imeshindikana kupata eneo lako (umekataa ruhusa?) — tafadhali andika mji wako hapo juu.");
+  });
+});
+
+document.getElementById("btnSearch").addEventListener("click", async () => {
+  const q = document.getElementById("locateInput").value.trim();
+  if (!q) return;
+  setStatus(`Inatafuta "${q}"...`);
+  try {
+    const data = await DaesAPI.searchLocations(q);
+    const box = document.getElementById("locateResults");
+    if (!data.results.length){
+      box.innerHTML = "";
+      setStatus(`Hakuna mji uliopatikana kwa "${q}". Jaribu jina lingine.`);
+      return;
+    }
+    box.innerHTML = data.results.map((r, i) => `<button class="locate-result-btn" data-idx="${i}">${r.name}${r.state ? ", " + r.state : ""}</button>`).join("");
+    box.querySelectorAll(".locate-result-btn").forEach((btn, i) => {
+      btn.addEventListener("click", () => {
+        const r = data.results[i];
+        const label = r.state ? `${r.name}, ${r.state}` : r.name;
+        loadWeatherFor(r.lat, r.lon, label);
+        box.innerHTML = "";
+      });
+    });
+    setStatus(`Chagua mji wako:`);
+  } catch (err) {
+    setStatus("Imeshindikana kutafuta mji (backend haipo mtandaoni?)");
+  }
+});
+
+document.getElementById("locateInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("btnSearch").click();
+});
+
+// Default view: Ilemela, until the farmer picks their own location.
+loadWeatherFor(-2.5167, 32.9000, "Ilemela, Mwanza");
 </script>
 </body></html>
